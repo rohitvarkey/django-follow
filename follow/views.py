@@ -1,11 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models.loading import cache
+from django.apps import apps
 from django.http import HttpResponse, HttpResponseRedirect, \
     HttpResponseServerError, HttpResponseBadRequest
 from follow.utils import follow as _follow, unfollow as _unfollow, toggle as _toggle
 
 def check(func):
-    """ 
+    """
     Check the permissions, http method and login state.
     """
     def iCheck(request, *args, **kwargs):
@@ -32,14 +32,14 @@ def check(func):
 @login_required
 @check
 def follow(request, app, model, id):
-    model = cache.get_model(app, model)
+    model = apps.get_model(app, model)
     obj = model.objects.get(pk=id)
     return _follow(request.user, obj)
 
 @login_required
 @check
 def unfollow(request, app, model, id):
-    model = cache.get_model(app, model)
+    model = apps.get_model(app, model)
     obj = model.objects.get(pk=id)
     return _unfollow(request.user, obj)
 
@@ -47,6 +47,6 @@ def unfollow(request, app, model, id):
 @login_required
 @check
 def toggle(request, app, model, id):
-    model = cache.get_model(app, model)
+    model = apps.get_model(app, model)
     obj = model.objects.get(pk=id)
     return _toggle(request.user, obj)
